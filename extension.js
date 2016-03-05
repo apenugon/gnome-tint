@@ -4,8 +4,10 @@ const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
 const Clutter = imports.gi.Clutter;
 const PopupMenu = imports.ui.popupMenu;
+const PanelMenu = imports.ui.panelMenu;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const IndicatorButton = Extension.imports.indicator_button;
 
 let button;
 let extension = null;
@@ -28,17 +30,28 @@ const DesktopTintExtension = new Lang.Class({
                     red: 255,
                     green: 100,
                     blue: 0,
-                    alpha: 255
+                    alpha: 120
                 });
         text.set_background_color(color);
 
-        text.opacity = max_opacity + 30;
+        text.opacity = 255;
 
         text.set_position(monitor.x,
                           monitor.y);
         // Arbitrary z position above everything else
         text.set_z_position(650);
 
+    },
+
+    setOverlayColor: function(red, green, blue, alpha, overlay) {
+        var color = new Clutter.Color(
+                {
+                    red: red,
+                    green: green,
+                    blue: blue,
+                    alpha: alpha
+                });
+        text.set_background_color(color);
     },
 
     toggleOverlay: function(actor, event) {
@@ -51,27 +64,20 @@ const DesktopTintExtension = new Lang.Class({
     enable: function() {
         this.createOverlay();
         Main.uiGroup.add_actor(text);
-        Main.panel._rightBox.insert_child_at_index(button, 0);
+        this.indicator = new IndicatorButton.IndicatorButton(this.toggleOverlay, this.setOverlayColor, text);
+        Main.panel.addToStatusArea("ChatStatus", this.indicator, 0, "right");
     },
 
     disable: function() {
-        Main.panel._rightBox.remove_child(button);
         Main.uiGroup.remove_actor(text);
         text = null;
+        if (this.indicator) this.indicator.destroy();
+
+        this.indicator = null;
     },
 
     _init: function() {
-        button = new St.Bin({ style_class: 'panel-button',
-                              reactive: true,
-                              can_focus: true,
-                              x_fill: true,
-                              y_fill: false,
-                              track_hover: true });
-        let icon = new St.Icon({ icon_name: 'system-run-symbolic',
-                                 style_class: 'system-status-icon' });
 
-        button.set_child(icon);
-        button.connect('button-press-event', this.toggleOverlay);
     }
 
 
