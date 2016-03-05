@@ -1,1 +1,1 @@
-{"uuid": "desktoptint@akulvp.gmail.com", "description": "Tints the entire desktop to a t.", "name": "Desktop Tint", "shell-version": ["3.18.3"]}
+{"uuid": "gnome-tint@akulvp.gmail.com", "description": "Creates an overlay that tints the desktop on Gnome. Use any color you like!", "name": "Gnome Tint", "shell-version": ["3.18.3"]}
