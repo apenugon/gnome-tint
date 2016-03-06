@@ -7,16 +7,6 @@ const Clutter = imports.gi.Clutter;
 const Signals = imports.signals;
 const Slider = imports.ui.slider;
 
-const Menu = new Lang.Class({
-    Name: 'DesktopTintMenu',
-    Extends: PopupMenu.PopupMenu,
-
-    _init: function(button, overlayToggle) {
-        this.parent(button.actor, St.Align.START, St.Side.TOP);
-
-    }
-});
-
 const IndicatorButton = new Lang.Class({
     Name: "IndicatorButton",
     Extends: PanelMenu.Button,
