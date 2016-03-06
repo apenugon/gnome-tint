@@ -11,18 +11,18 @@ const IndicatorButton = Extension.imports.indicator_button;
 
 let button;
 let extension = null;
-let max_opacity = 30 * 255/100;
 
-let text;
+let overlay;
+let overlayOn = false;
 
 const DesktopTintExtension = new Lang.Class({
     Name: 'DesktopTintExtension',
 
     createOverlay: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        text = new St.Bin({ reactive: false, x_fill: true, y_fill: true });
+        overlay = new St.Bin({ reactive: false, x_fill: true, y_fill: true });
 
-        text.set_size(monitor.width, monitor.height);
+        overlay.set_size(monitor.width, monitor.height);
 
 
         var color = new Clutter.Color(
@@ -32,18 +32,18 @@ const DesktopTintExtension = new Lang.Class({
                     blue: 0,
                     alpha: 120
                 });
-        text.set_background_color(color);
+        overlay.set_background_color(color);
 
-        text.opacity = 255;
+        overlay.opacity = 255;
 
-        text.set_position(monitor.x,
+        overlay.set_position(monitor.x,
                           monitor.y);
         // Arbitrary z position above everything else
-        text.set_z_position(650);
+        overlay.set_z_position(650);
 
     },
 
-    setOverlayColor: function(red, green, blue, alpha, overlay) {
+    setOverlayColor: function(red, green, blue, alpha) {
         var color = new Clutter.Color(
                 {
                     red: red,
@@ -51,26 +51,31 @@ const DesktopTintExtension = new Lang.Class({
                     blue: blue,
                     alpha: alpha
                 });
-        text.set_background_color(color);
+        overlay.set_background_color(color);
     },
 
     toggleOverlay: function(actor, event) {
-        if (text.opacity === 0)
-            text.opacity = max_opacity;
-        else
-            text.opacity = 0;
+        if (overlayOn) {
+            Main.uiGroup.remove_actor(overlay);
+            overlayOn = false;
+        } else {
+            Main.uiGroup.add_actor(overlay);
+            overlayOn = true;
+        }
     },
 
     enable: function() {
         this.createOverlay();
-        Main.uiGroup.add_actor(text);
-        this.indicator = new IndicatorButton.IndicatorButton(this.toggleOverlay, this.setOverlayColor, text);
+        Main.uiGroup.add_actor(overlay);
+        overlayOn = true;
+        this.indicator = new IndicatorButton.IndicatorButton(this.toggleOverlay, this.setOverlayColor, overlay);
         Main.panel.addToStatusArea("ChatStatus", this.indicator, 0, "right");
     },
 
     disable: function() {
-        Main.uiGroup.remove_actor(text);
-        text = null;
+        Main.uiGroup.remove_actor(overlay);
+        overlay = null;
+        overlayOn = false;
         if (this.indicator) this.indicator.destroy();
 
         this.indicator = null;
@@ -84,14 +89,15 @@ const DesktopTintExtension = new Lang.Class({
 });
 
 function init() {
-    extension = new DesktopTintExtension();
 
 }
 
 function enable() {
+    extension = new DesktopTintExtension();
     extension.enable();
 }
 
 function disable() {
     extension.disable();
+    extension = null;
 }

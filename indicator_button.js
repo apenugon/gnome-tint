@@ -93,7 +93,6 @@ const IndicatorButton = new Lang.Class({
         this._setOverlayColor(255 * this._redSlider._getCurrentValue(),
                 255 * this._greenSlider._getCurrentValue(),
                 255 * this._blueSlider._getCurrentValue(),
-                255 * this._alphaSlider._getCurrentValue(),
-                this._overlay);
+                255 * this._alphaSlider._getCurrentValue());
     }
 });
